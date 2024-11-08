@@ -1,0 +1,46 @@
+@import 'antd/dist/reset.css';
+
+.ant-upload-drag {
+  @apply border-2 border-dashed border-blue-300 hover:border-blue-500 transition-colors duration-300;
+}
+
+.ant-table-wrapper {
+  @apply overflow-hidden;
+  
+  .ant-table {
+    @apply rounded-lg;
+  }
+  
+  .ant-table-thead > tr > th {
+    @apply bg-gray-50 font-semibold text-gray-700;
+  }
+  
+  .ant-table-tbody > tr:hover > td {
+    @apply bg-blue-50;
+  }
+}
+
+.ant-tag {
+  @apply font-medium;
+}
+
+.ant-select:not(.ant-select-disabled):hover .ant-select-selector {
+  @apply border-blue-500;
+}
+
+.ant-input-search .ant-input:hover,
+.ant-input-search .ant-input:focus {
+  @apply border-blue-500;
+}
+
+.ant-picker {
+  @apply border-gray-300 hover:border-blue-500 focus:border-blue-500;
+  
+  &-focused {
+    @apply border-blue-500 shadow-none;
+  }
+}
+
+.ant-picker-range {
+  @apply w-auto;
+}
