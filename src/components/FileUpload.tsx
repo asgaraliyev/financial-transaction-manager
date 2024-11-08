@@ -1,21 +1,16 @@
-import React from 'react';
-import { Upload, message } from 'antd';
-import { InboxOutlined } from '@ant-design/icons';
-import * as XLSX from 'xlsx';
-import { useTransactionStore } from '../store/transactionStore';
-import { v4 as uuidv4 } from 'uuid';
-import { TransactionSchema } from '../schemas/transaction';
-import { z } from 'zod';
+import React from "react";
+import { Upload, message } from "antd";
+import { InboxOutlined } from "@ant-design/icons";
+import * as XLSX from "xlsx";
+import { useTransactionStore } from "../store/transactionStore";
+import { v4 as uuidv4 } from "uuid";
+import { TransactionSchema } from "../schemas/transaction";
+import { z } from "zod";
+import { ExcelRowSchema } from "../schemas/ExcelRowSchema";
+import { convertToUnderstandableData } from "../functions/convertToUnderstandableData";
 
 const { Dragger } = Upload;
 
-const ExcelRowSchema = z.object({
-  Date: z.string(),
-  Description: z.string(),
-  Amount: z.string().transform((val) => parseFloat(val)),
-  Category: z.string().optional(),
-  Reference: z.string().optional(),
-});
 
 export const FileUpload: React.FC = () => {
   const setTransactions = useTransactionStore((state) => state.setTransactions);
@@ -25,36 +20,40 @@ export const FileUpload: React.FC = () => {
     reader.onload = (e) => {
       try {
         const data = e.target?.result;
-        const workbook = XLSX.read(data, { type: 'binary' });
+        const workbook = XLSX.read(data, { type: "binary" });
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
         const jsonData = XLSX.utils.sheet_to_json(worksheet);
-
+        // console.log("jsonData", jsonData);
         const validatedData = z.array(ExcelRowSchema).parse(jsonData);
 
         const transactions = validatedData.map((row) => {
+          const convertedRow=convertToUnderstandableData(row)
+          console.log("convertedRow", convertedRow)
           const transaction = {
             id: uuidv4(),
-            date: row.Date,
-            description: row.Description,
-            amount: row.Amount,
-            type: row.Amount >= 0 ? 'credit' : 'debit',
-            category: row.Category || 'Uncategorized',
-            reference: row.Reference || '',
+            date: convertedRow.Date,
+            description: convertedRow.Description,
+            amount: convertedRow.Amount,
+            type: convertedRow.Amount >= 0 ? "credit" : "debit",
+            category: convertedRow.Category || "Uncategorized",
+            reference: convertedRow.Reference || "",
           };
 
           return TransactionSchema.parse(transaction);
         });
 
         setTransactions(transactions);
-        message.success('File uploaded and validated successfully');
+        message.success("File uploaded and validated successfully");
       } catch (error) {
         if (error instanceof z.ZodError) {
-          message.error('Invalid file format: Please check your Excel file structure');
-          console.error('Validation error:', error.errors);
+          message.error(
+            "Invalid file format: Please check your Excel file structure"
+          );
+          console.error("Validation error:", error.errors);
         } else {
-          message.error('Error processing file');
-          console.error('Processing error:', error);
+          message.error("Error processing file");
+          console.error("Processing error:", error);
         }
       }
     };
@@ -62,9 +61,9 @@ export const FileUpload: React.FC = () => {
   };
 
   const uploadProps = {
-    name: 'file',
+    name: "file",
     multiple: false,
-    accept: '.xlsx,.xls,.csv',
+    accept: ".xlsx,.xls,.csv",
     beforeUpload: (file: File) => {
       processExcelFile(file);
       return false;

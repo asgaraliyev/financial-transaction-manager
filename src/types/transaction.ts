@@ -1,12 +1,4 @@
-export interface Transaction {
-  id: string;
-  date: string;
-  description: string;
-  amount: number;
-  type: 'credit' | 'debit';
-  category: string;
-  reference: string;
-}
+import { Transaction } from "../schemas/transaction";
 
 export interface TransactionStore {
   transactions: Transaction[];
