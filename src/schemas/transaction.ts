@@ -2,12 +2,10 @@ import { z } from 'zod';
 
 export const TransactionSchema = z.object({
   id: z.string().uuid(),
-  date: z.string(),
+  date: z.date(),
   description: z.string().min(1, 'Description is required'),
   amount: z.number(),
-  type: z.enum(['credit', 'debit']),
-  category: z.string(),
-  reference: z.string(),
+  to:z.string(),
 });
 
 export const TransactionInputSchema = TransactionSchema.omit({ id: true });
